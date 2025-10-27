@@ -1,0 +1,52 @@
+from machine import Pin, PWM, ADC
+from time import sleep
+
+button = Pin(14, Pin.IN, Pin.PULL_DOWN)
+buzzer = PWM(Pin(15))
+pot = ADC(26)
+
+led_brightness = PWM(Pin(16))
+led_brightness.freq(1000)
+
+red = PWM(Pin(17))
+green = PWM(Pin(18))
+blue = PWM(Pin(19))
+for led in [red, green, blue]:
+    led.freq(1000)
+
+def pot_to_rgb(value):
+    segment = value // 21845
+    remainder = value % 21845
+    max_val = 65535
+    if segment == 0:
+        r = max_val - (remainder * max_val // 21845)
+        g = remainder * max_val // 21845
+        b = 0
+    elif segment == 1:
+        r = 0
+        g = max_val - (remainder * max_val // 21845)
+        b = remainder * max_val // 21845
+    else:
+        r = remainder * max_val // 21845
+        g = 0
+        b = max_val - (remainder * max_val // 21845)
+    return (r, g, b)
+
+while True:
+    pot_value = pot.read_u16()
+    if button.value() == 1:
+        freq = int(200 + (pot_value / 65535) * 1800)
+        buzzer.freq(freq)
+        buzzer.duty_u16(30000)
+        led_brightness.duty_u16(pot_value)
+        r, g, b = pot_to_rgb(pot_value)
+        red.duty_u16(r)
+        green.duty_u16(g)
+        blue.duty_u16(b)
+    else:
+        buzzer.duty_u16(0)
+        led_brightness.duty_u16(0)
+        red.duty_u16(0)
+        green.duty_u16(0)
+        blue.duty_u16(0)
+    sleep(0.05)
