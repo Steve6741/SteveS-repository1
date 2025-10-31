@@ -1,0 +1,9 @@
+from machine import Pin
+import time
+
+# Define the onboard LED pin (GPIO 25 on the Pico)
+led = Pin(15, Pin.OUT)
+
+while True:
+    led.toggle()  # Toggle the LED state (on/off)
+    time.sleep(1)  # Wait for 1 second
