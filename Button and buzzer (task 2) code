@@ -1,0 +1,15 @@
+from machine import Pin
+import time
+
+# Define pins
+button = Pin(0, Pin.IN, Pin.PULL_UP)  # Button on GP0
+buzzer = Pin(1, Pin.OUT)  # Buzzer on GP1
+
+while True:
+    if not button.value():  # Button pressed (logic LOW)
+        buzzer.value(1)  # Turn buzzer ON
+        time.sleep(0.1)
+        buzzer.value(0)  # Turn buzzer OFF
+        time.sleep(0.2)  # Debounce delay
+    else:
+        buzzer.value(0)  # Make sure buzzer is off
